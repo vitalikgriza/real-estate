@@ -4,7 +4,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import {authMiddleware} from "./milddleware/auth-middleware";
 /* ROUTE IMPORT */
+import tenantsRoutes from "./routes/tenants-routes";
+import managerRoutes from "./routes/managers-routes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -21,6 +24,9 @@ app.use(cors());
 app.get('/', (req, res) => {
   res.send('Home route is working!');
 })
+
+app.use('/tenants', authMiddleware(['tenant']), tenantsRoutes);
+app.use('/managers', authMiddleware(['manager']), managerRoutes);
 
 /* SERVER */
 const port = process.env.PORT || 3003;
