@@ -148,7 +148,7 @@ const Auth = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const isAuthPage = pathname.match(/^\/(sign(in|up))$/);
   const isDashboardPage =
-    pathname.startsWith("/manager") || pathname.startsWith("/tenant");
+    pathname.startsWith("/managers") || pathname.startsWith("/tenants");
 
   useEffect(() => {
     if (user && isAuthPage) {
