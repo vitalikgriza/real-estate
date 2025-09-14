@@ -148,4 +148,4 @@ const AppSidebar = ({ userType }: AppSidebarProps) => {
   );
 };
 
-export default AppSidebar;
+export { AppSidebar };

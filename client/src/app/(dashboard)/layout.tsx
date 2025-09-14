@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { NavBar } from "@/components/navbar";
 import { NAVBAR_HEIGHT } from "@/lib/constants";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import AppSidebar from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 import { useGetAuthUserQuery } from "@/state/api";
 import { usePathname, useRouter } from "next/navigation";
 

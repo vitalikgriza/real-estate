@@ -41,3 +41,21 @@ export const getTenant = async (req: Request<TenantRequestParams>, res: Response
       res.status(500).json({ message: 'Error create tenant ' + error.message });
     }
   }
+
+
+
+export const updateTenant = async (req: Request<TenantRequestParams>, res: Response): Promise<void> => {
+  const { cognitoId } = req.params;
+  const { name, email, phoneNumber } = req.body;
+
+  try {
+    const updatedTenant = await prisma.tenant.update({
+      where: { cognitoId },
+      data: { name, email, phoneNumber},
+    });
+
+    res.send(updatedTenant);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error updating tenant ' + error.message });
+  }
+}
