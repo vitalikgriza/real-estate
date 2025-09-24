@@ -6,8 +6,11 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import {authMiddleware} from "./milddleware/auth-middleware";
 /* ROUTE IMPORT */
-import tenantsRoutes from "./routes/tenants-routes";
-import managerRoutes from "./routes/managers-routes";
+import tenantRoutes from "./routes/tenant-routes";
+import managerRoutes from "./routes/manager-routes";
+import propertyRoutes from "./routes/property-routes";
+import leaseRoutes from "./routes/lease-routes";
+import applicationRoutes from "./routes/application-routes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -25,7 +28,10 @@ app.get('/', (req, res) => {
   res.send('Home route is working!');
 })
 
-app.use('/tenants', authMiddleware(['tenant']), tenantsRoutes);
+app.use('/applications', applicationRoutes);
+app.use('/properties', propertyRoutes);
+app.use('leases', authMiddleware(['manager', 'tenant']), leaseRoutes);
+app.use('/tenants', authMiddleware(['tenant']), tenantRoutes);
 app.use('/managers', authMiddleware(['manager']), managerRoutes);
 
 /* SERVER */
