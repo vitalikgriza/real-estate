@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { setFilters, setViewMode, toggleFiltersFullOpen } from "@/state";
 import { debounce } from "lodash";
-import { cleanParams, cn, formatPriceValue } from "@/lib/utils";
+import { cn, formatPriceValue, updateSearchParams } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Filter, Grid, List, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -30,16 +30,8 @@ const FiltersBar = () => {
   const [searchInput, setSearchInput] = useState(filters.location);
 
   const updateURL = debounce((newFilters) => {
-    const cleanFilters = cleanParams(newFilters);
-    const urlSearchParams = new URLSearchParams();
-    Object.entries(cleanFilters).forEach(([key, value]) => {
-      urlSearchParams.set(
-        key,
-        Array.isArray(value) ? value.join(",") : String(value),
-      );
-    });
-
-    router.push(`${pathname}?${urlSearchParams.toString()}`);
+    const urlSearchParams = updateSearchParams(newFilters);
+    router.push(`${pathname}?${urlSearchParams}`);
   });
 
   const handleFilterChange = (
@@ -159,7 +151,7 @@ const FiltersBar = () => {
         {/* Beds */}
         <div className="flex gap-1">
           <Select
-            value={filters.beds}
+            value={filters.beds || "any"}
             onValueChange={(value) => handleFilterChange("beds", value, null)}
           >
             <SelectTrigger className="rounded-xl border-primary-400">
@@ -175,7 +167,7 @@ const FiltersBar = () => {
           </Select>
           {/* Baths */}
           <Select
-            value={filters.baths}
+            value={filters.baths || "any"}
             onValueChange={(value) => handleFilterChange("baths", value, null)}
           >
             <SelectTrigger className="w-30 rounded-xl border-primary-400">

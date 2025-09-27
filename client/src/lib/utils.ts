@@ -25,15 +25,27 @@ export function cleanParams(params: Record<string, any>): Record<string, any> {
   return Object.fromEntries(
     Object.entries(params).filter(
       (
-        [_, value] // eslint-disable-line @typescript-eslint/no-unused-vars
+        [_, value], // eslint-disable-line @typescript-eslint/no-unused-vars
       ) =>
         value !== undefined &&
         value !== "any" &&
         value !== "" &&
-        (Array.isArray(value) ? value.some((v) => v !== null) : value !== null)
-    )
+        (Array.isArray(value) ? value.some((v) => v !== null) : value !== null),
+    ),
   );
 }
+
+export const updateSearchParams = (newFilters: Record<string, any>) => {
+  const cleanFilters = cleanParams(newFilters);
+  const urlSearchParams = new URLSearchParams();
+  Object.entries(cleanFilters).forEach(([key, value]) => {
+    urlSearchParams.set(
+      key,
+      Array.isArray(value) ? value.join(",") : String(value),
+    );
+  });
+  return urlSearchParams.toString();
+};
 
 type MutationMessages = {
   success?: string;
@@ -42,7 +54,7 @@ type MutationMessages = {
 
 export const withToast = async <T>(
   mutationFn: Promise<T>,
-  messages: Partial<MutationMessages>
+  messages: Partial<MutationMessages>,
 ) => {
   const { success, error } = messages;
 
@@ -60,7 +72,7 @@ export const createNewUserInDatabase = async (
   user: any,
   idToken: any,
   userRole: string,
-  fetchWithBQ: any
+  fetchWithBQ: any,
 ) => {
   const createEndpoint =
     userRole?.toLowerCase() === "manager" ? "/managers" : "/tenants";
