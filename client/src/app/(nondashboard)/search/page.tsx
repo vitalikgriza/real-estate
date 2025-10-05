@@ -8,6 +8,8 @@ import { cleanParams, cn } from "@/lib/utils";
 import { FiltersBar } from "@/app/(nondashboard)/search/filters-bar";
 import { FiltersFull } from "@/app/(nondashboard)/search/filters-full";
 import { setFilters } from "@/state";
+import { Map } from "@/app/(nondashboard)/search/map";
+import { Listings } from "@/app/(nondashboard)/search/listings";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
@@ -58,8 +60,10 @@ const SearchPage = () => {
         >
           <FiltersFull />
         </div>
-        {/*<Map />*/}
-        <div className="basis-4/12 overflow-y-auto">{/*<Listings />*/}</div>
+        <Map />
+        <div className="basis-4/12 overflow-y-auto">
+          <Listings />
+        </div>
       </div>
     </div>
   );

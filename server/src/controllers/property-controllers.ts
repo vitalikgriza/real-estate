@@ -5,7 +5,9 @@ import {Upload} from "@aws-sdk/lib-storage";
 import {S3Client} from "@aws-sdk/client-s3";
 import axios from "axios";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query'],
+});
 const s3Client = new S3Client({
   region: process.env.AWS_REGION!,
 });
@@ -89,33 +91,33 @@ export const getProperties = async (req: Request, res: Response) => {
 
    if (latitude && longitude) {
      const lat = parseFloat(latitude as string);
-     const lon = parseFloat(longitude as string);
+     const lng = parseFloat(longitude as string);
      const radiusInKm = 1000;
      const degrees = radiusInKm / 111
 
      whereConditions.push(
        Prisma.sql`ST_DWithin(
-        l.coordinates::geometry,
-        ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326),
+       l.coordinates::geometry,
+        ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326),
         ${degrees}
         )`
      )
    }
 
    const completeQuery = Prisma.sql`
-     SELECT p.*
+     SELECT p.*,
      json_build_object(
         'id', l.id,
         'address', l.address,
         'city', l.city,
         'state', l.state,
         'country', l.country,
-        'postalCode', l.postalCode,
+        'postalCode', l."postalCode",
         'coordinates', json_build_object(
           'latitude', ST_Y(l.coordinates::geometry),
           'longitude', ST_X(l.coordinates::geometry)
           )
-        ) as location,
+        ) as location
         FROM "Property" p
         JOIN "Location" l ON p."locationId" = l.id
         ${whereConditions.length ? Prisma.sql`WHERE ${Prisma.join(whereConditions, ' AND ')}` : Prisma.empty}

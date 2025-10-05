@@ -29,7 +29,7 @@ export const initialState: GlobalState = {
     availableFrom: "",
     priceRange: [null, null],
     squareFeetRange: [null, null],
-    coordinates: [0, 0],
+    coordinates: [-118.25, 34.05],
   },
   viewMode: "grid", // or 'list'
 };
