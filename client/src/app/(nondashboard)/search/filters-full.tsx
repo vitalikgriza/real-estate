@@ -22,7 +22,6 @@ function FiltersFull() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const filters = useAppSelector((state) => state.global.filters);
   const [localFilters, setLocalFilters] = useState(initialState.filters);
   const isFiltersFullOpen = useAppSelector(
     (state) => state.global.isFiltersFullOpen,
@@ -54,6 +53,25 @@ function FiltersFull() {
     });
   };
 
+  const handleLocationSearch = () => {
+    fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(`${localFilters.location}.json`)}?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&fuzzyMatch=true`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.features && data.features.length > 0) {
+          const [longitude, latitude] = data.features[0].center;
+          setLocalFilters((prev) => ({
+            ...prev,
+            coordinates: [longitude, latitude],
+          }));
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching coordinates:", error);
+      });
+  };
+
   if (!isFiltersFullOpen) {
     return null;
   }
@@ -67,17 +85,17 @@ function FiltersFull() {
           <div className="flex items-center">
             <Input
               placeholder="Enter location"
-              value={filters.location}
-              onChange={(e) =>
+              value={localFilters.location}
+              onChange={(e) => {
                 setLocalFilters((prev) => ({
                   ...prev,
                   location: e.target.value,
-                }))
-              }
+                }));
+              }}
               className="rounded-l-xl rounded-r-none border-r-0"
             />
             <Button
-              // onClick={handleLocationSearch}
+              onClick={handleLocationSearch}
               className="rounded-r-xl rounded-l-none border-l-none border-black shadow-none border hover:bg-primary-700 hover:text-primary-50"
             >
               <Search className="w-4 h-4" />

@@ -29,6 +29,8 @@ const SearchPage = () => {
           acc[key] = [min, max];
         } else if (key === "coordinates") {
           acc[key] = value.split(",").map((v) => Number(v));
+        } else if (key === "amenities") {
+          acc[key] = value ? value.split(",") : [];
         } else {
           acc[key] = value === "any" ? null : value;
         }
@@ -39,7 +41,7 @@ const SearchPage = () => {
     );
     const cleanedFilters = cleanParams(initialFilters);
     dispatch(setFilters(cleanedFilters));
-  }, []);
+  }, [searchParams]);
 
   return (
     <div

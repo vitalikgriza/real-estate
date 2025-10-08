@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from "@/state/redux";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { setFilters, setViewMode, toggleFiltersFullOpen } from "@/state";
 import { debounce } from "lodash";
@@ -57,6 +57,35 @@ const FiltersBar = () => {
     updateURL(newFilters);
   };
 
+  const handleLocationSearch = () => {
+    fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(`${searchInput}.json`)}?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&fuzzyMatch=true`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.features && data.features.length > 0) {
+          const [longitude, latitude] = data.features[0].center;
+          dispatch(
+            setFilters({
+              coordinates: [longitude, latitude],
+              location: searchInput,
+            }),
+          );
+          updateURL({
+            coordinates: [longitude, latitude],
+            location: searchInput,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching coordinates:", error);
+      });
+  };
+
+  useEffect(() => {
+    setSearchInput(filters.location);
+  }, [filters.location]);
+
   return (
     <div className="flex justify-between items-center w-full py-5">
       {/* Filters */}
@@ -83,7 +112,7 @@ const FiltersBar = () => {
           <Button
             className="rounded-r-xl rounded-l-none border-primary-400 shadow-none border
             hover:bg-primary-700 hover:text-primary-50"
-            // onClick={handleLocationSearch}
+            onClick={handleLocationSearch}
           >
             <Search className="w-4 h-4" />
           </Button>

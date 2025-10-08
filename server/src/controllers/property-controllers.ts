@@ -63,13 +63,13 @@ export const getProperties = async (req: Request, res: Response) => {
    }
 
    if (propertyType && propertyType !== 'any') {
-     whereConditions.push(Prisma.sql`p.propertyType = ${propertyType}::"PropertyType"`);
+     whereConditions.push(Prisma.sql`p."propertyType" = ${propertyType}::"PropertyType"`);
    }
 
    if (amenities) {
      const amenitiesArray = (amenities as string).split(',');
      whereConditions.push(
-       Prisma.sql`p.amenities @> ${amenitiesArray}`
+       Prisma.sql`p."amenities" @> ${amenitiesArray}::"Amenity"[]`
      );
    }
 
@@ -77,12 +77,13 @@ export const getProperties = async (req: Request, res: Response) => {
      const availableFromDate = availableFrom ? new Date(availableFrom as string) : null;
      if (availableFromDate) {
        const date = new Date(availableFromDate);
+       console.log('Parsed availableFrom date:', date.toISOString());
        if (!isNaN(date.getTime())) {
          whereConditions.push(
            Prisma.sql`EXISTS (
             SELECT 1 FROM "Lease" l
             WHERE l."propertyId" = p.id
-            AND l."startDate" >= ${date.toISOString()}
+            AND l."startDate" >= ${date.toISOString()}::timestamp
           )`
          );
        }
