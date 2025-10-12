@@ -108,6 +108,11 @@ export const api = createApi({
         return [{ type: "Properties", id: "LIST" }];
       },
     }),
+    getProperty: build.query<Property, number>({
+      query: (propertyId) => `/properties/${propertyId}`,
+      providesTags: (result) =>
+        result ? [{ type: "Properties", id: result.id }] : [],
+    }),
 
     // tenants related endpoints
     getTenant: build.query<Tenant, string>({
@@ -158,6 +163,7 @@ export const api = createApi({
 export const {
   useGetAuthUserQuery,
   useGetPropertiesQuery,
+  useGetPropertyQuery,
   useGetTenantQuery,
   useUpdateTenantSettingsMutation,
   useUpdateManagerSettingsMutation,
