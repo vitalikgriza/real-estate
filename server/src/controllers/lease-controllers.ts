@@ -3,9 +3,9 @@ import { Request, Response } from 'express';
 
 const prisma = new PrismaClient();
 
-export const getLeases = (req: Request, res: Response) => {
+export const getLeases = async (req: Request, res: Response) => {
   try {
-    const leases = prisma.lease.findMany({
+    const leases = await prisma.lease.findMany({
       include: {
         tenant: true,
         property: true,

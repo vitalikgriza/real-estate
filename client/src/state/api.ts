@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession } from "@aws-amplify/core";
-import { Manager, Property, Tenant } from "@/types/prismaTypes";
+import { Lease, Manager, Payment, Property, Tenant } from "@/types/prismaTypes";
 import { getCurrentUser } from "@aws-amplify/auth";
 import { cleanParams, createNewUserInDatabase } from "@/lib/utils";
 import { FilterState } from "@/state/index";
@@ -18,7 +18,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Managers", "Tenants", "Properties"],
+  tagTypes: ["Managers", "Tenants", "Properties", "Leases", "Payments"],
   endpoints: (build) => ({
     getAuthUser: build.query<User, void>({
       queryFn: async (_, _queryApi, _extraOption, fetchWithBQ) => {
@@ -120,6 +120,16 @@ export const api = createApi({
       providesTags: (result) =>
         result ? [{ type: "Tenants", id: result.id }] : [],
     }),
+    getCurrentResidences: build.query<Property[], string>({
+      query: (cognitoId) => `/tenants/${cognitoId}/current-residences`,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: "Properties" as const, id })),
+              { type: "Properties", id: "LIST" },
+            ]
+          : [{ type: "Properties", id: "LIST" }],
+    }),
     updateTenantSettings: build.mutation<
       Tenant,
       { cognitoId: string } & Partial<Tenant>
@@ -157,6 +167,18 @@ export const api = createApi({
         { type: "Properties", id: "LIST" },
       ],
     }),
+
+    // leases related endpoints
+    getLeases: build.query<Lease[], void>({
+      query: () => `/leases`,
+      providesTags: ["Leases"],
+    }),
+
+    // payments related endpoints
+    getPayments: build.query<Payment[], number>({
+      query: (leaseId) => `/leases/${leaseId}/payments`,
+      providesTags: ["Payments"],
+    }),
   }),
 });
 
@@ -165,6 +187,9 @@ export const {
   useGetPropertiesQuery,
   useGetPropertyQuery,
   useGetTenantQuery,
+  useGetCurrentResidencesQuery,
+  useGetLeasesQuery,
+  useGetPaymentsQuery,
   useUpdateTenantSettingsMutation,
   useUpdateManagerSettingsMutation,
   useAddFavoritePropertyMutation,

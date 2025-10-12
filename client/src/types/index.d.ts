@@ -98,7 +98,7 @@ declare global {
   interface CardProps {
     property: Property;
     isFavorite: boolean;
-    onFavoriteToggle: () => void;
+    onFavoriteToggle?: () => void;
     showFavoriteButton?: boolean;
     propertyLink?: string;
   }
