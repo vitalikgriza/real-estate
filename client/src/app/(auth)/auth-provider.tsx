@@ -146,7 +146,7 @@ const Auth = ({ children }: { children: ReactNode }) => {
   const { user } = useAuthenticator((context) => [context.user]);
   const router = useRouter();
   const pathname = usePathname();
-  const isAuthPage = pathname.match(/^\/(sign(in|up))$/);
+  const isAuthPage = pathname.match(/^\/(signin|signup)$/);
   const isDashboardPage =
     pathname.startsWith("/managers") || pathname.startsWith("/tenants");
 
