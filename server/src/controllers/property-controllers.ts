@@ -132,6 +132,25 @@ export const getProperties = async (req: Request, res: Response) => {
  }
 }
 
+export const getPropertyLeases = async (req: Request, res: Response) => {
+  const {id} = req.params;
+  try {
+    const leases = await prisma.lease.findMany({
+      where: {propertyId: Number(id)},
+      include: {
+        tenant: true,
+      },
+      orderBy: {
+        startDate: 'desc',
+      }
+    });
+
+    res.json(leases);
+  } catch (err: any) {
+    res.status(500).json({message: 'Error retrieving leases ' + err.message});
+  }
+}
+
 
 export const getProperty = async (req: Request, res: Response) => {
   try {
@@ -231,7 +250,7 @@ export const createProperty = async (req: Request, res: Response) => {
     const [location] = await prisma.$queryRaw<Location[]>`
       INSERT INTO "Location" (address, city, state, country, "postalCode", coordinates) 
       VALUES (${address}, ${city}, ${state}, ${country}, ${postalCode}, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326))
-      RETURNING id, address, city, state, country, "postalCode", ST_AsText(coordinates) as coordinates
+      RETURNING id, address, city, state, country, "postalCode", ST_AsText(coordinates) as coordinates;
     `;
 
     const newProperty = await prisma.property.create({
@@ -253,6 +272,7 @@ export const createProperty = async (req: Request, res: Response) => {
         beds: parseInt(propertyData.beds, 10),
         baths: parseInt(propertyData.baths, 10),
         squareFeet: parseInt(propertyData.squareFeet, 10),
+        applicationFee: parseFloat(propertyData.applicationFee),
       },
       include: {
         location: true,

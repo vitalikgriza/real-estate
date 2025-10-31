@@ -71,7 +71,8 @@ export const api = createApi({
       }),
       invalidatesTags: (result) => [{ type: "Managers", id: result?.id }],
     }),
-    // property-related endpoints
+
+    // PROPERTY-RELATED ENDPOINTS
     getProperties: build.query<
       Property[],
       Partial<FilterState> & { favoriteIds?: number[] }
@@ -114,7 +115,7 @@ export const api = createApi({
         result ? [{ type: "Properties", id: result.id }] : [],
     }),
 
-    // tenants related endpoints
+    // TENANTS RELATED ENDPOINTS
     getTenant: build.query<Tenant, string>({
       query: (cognitoId) => `/tenants/${cognitoId}`,
       providesTags: (result) =>
@@ -168,13 +169,41 @@ export const api = createApi({
       ],
     }),
 
-    // leases related endpoints
+    // MANAGER PROPERTIES ENDPOINTS
+    getManagerProperties: build.query<Property[], string>({
+      query: (cognitoId) => `/managers/${cognitoId}/properties`,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: "Properties" as const, id })),
+              { type: "Properties", id: "LIST" },
+            ]
+          : [{ type: "Properties", id: "LIST" }],
+    }),
+    createProperty: build.mutation<Property, FormData>({
+      query: (newProperty) => ({
+        url: `properties`,
+        method: "POST",
+        body: newProperty,
+      }),
+      invalidatesTags: (result) => [
+        { type: "Properties", id: "LIST" },
+        { type: "Managers", id: result?.manager?.id },
+      ],
+    }),
+
+    // LEASES RELATED ENDPOINTS
     getLeases: build.query<Lease[], void>({
       query: () => `/leases`,
       providesTags: ["Leases"],
     }),
 
-    // payments related endpoints
+    getPropertyLeases: build.query<Lease[], number>({
+      query: (propertyId) => `/properties/${propertyId}/leases`,
+      providesTags: ["Leases"],
+    }),
+
+    // PAYMENTS RELATED ENDPOINTS
     getPayments: build.query<Payment[], number>({
       query: (leaseId) => `/leases/${leaseId}/payments`,
       providesTags: ["Payments"],
@@ -188,10 +217,13 @@ export const {
   useGetPropertyQuery,
   useGetTenantQuery,
   useGetCurrentResidencesQuery,
+  useGetManagerPropertiesQuery,
   useGetLeasesQuery,
+  useGetPropertyLeasesQuery,
   useGetPaymentsQuery,
   useUpdateTenantSettingsMutation,
   useUpdateManagerSettingsMutation,
   useAddFavoritePropertyMutation,
+  useCreatePropertyMutation,
   useRemoveFavoritePropertyMutation,
 } = api;

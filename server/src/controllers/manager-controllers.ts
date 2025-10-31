@@ -78,7 +78,7 @@ export const getManagerProperties = async (req: Request<ManagerRequestParams>, r
     const propertiesWithCoords = await Promise.all(properties.map(async (property) => {
       const coordinates: { coordinates: string } [] = await prisma.$queryRaw`
           SELECT ST_AsText(l.coordinates) as coordinates
-          FROM "Location"
+          FROM "Location" l
           WHERE id = ${property.locationId}
       `;
       const geoJSON = wktToGeoJSON(coordinates[0]?.coordinates || "");
