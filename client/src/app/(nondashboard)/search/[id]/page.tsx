@@ -8,6 +8,7 @@ import { PropertyOverview } from "@/app/(nondashboard)/search/[id]/property-over
 import { PropertyDetails } from "@/app/(nondashboard)/search/[id]/property-details";
 import PropertyLocation from "@/app/(nondashboard)/search/[id]/property-location";
 import ContactWidget from "@/app/(nondashboard)/search/[id]/contact-widget";
+import ApplicationModal from "@/app/(nondashboard)/search/[id]/application-modal";
 
 const SingleListing = () => {
   const { id } = useParams();
@@ -30,6 +31,13 @@ const SingleListing = () => {
         <div className="order-1 md:order-2">
           <ContactWidget onOpenModal={() => setIsModalOpen(true)} />
         </div>
+        {authUser && (
+          <ApplicationModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            propertyId={propertyId}
+          />
+        )}
       </div>
     </div>
   );

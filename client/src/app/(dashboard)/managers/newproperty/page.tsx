@@ -15,7 +15,7 @@ const NewProperty = () => {
   const [createProperty] = useCreatePropertyMutation();
   const { data: authUser } = useGetAuthUserQuery();
 
-  const form = useForm<PropertyFormData>({
+  const form = useForm({
     resolver: zodResolver(propertySchema),
     defaultValues: {
       name: "",

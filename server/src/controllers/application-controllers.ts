@@ -8,20 +8,19 @@ const prisma = new PrismaClient({
 
 export const listApplications = async (req: Request, res: Response) => {
   const { userId, userType  } = req.query;
-  const userIdNumber = Number(userId);
   try {
     let whereClause = {};
     if (userType === 'manager') {
       whereClause = {
         where: {
           property: {
-            managerCognitoId: userIdNumber,
+            managerCognitoId: userId,
           }
         }
       }
     } else if (userType === 'tenant') {
       whereClause = {
-        where : { tenantCognitoId: userIdNumber },
+        where : { tenantCognitoId: userId },
       }
     }
 

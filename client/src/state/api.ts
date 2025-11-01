@@ -1,6 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession } from "@aws-amplify/core";
-import { Lease, Manager, Payment, Property, Tenant } from "@/types/prismaTypes";
+import {
+  Application,
+  Lease,
+  Manager,
+  Payment,
+  Property,
+  Tenant,
+} from "@/types/prismaTypes";
 import { getCurrentUser } from "@aws-amplify/auth";
 import { cleanParams, createNewUserInDatabase } from "@/lib/utils";
 import { FilterState } from "@/state/index";
@@ -18,7 +25,14 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Managers", "Tenants", "Properties", "Leases", "Payments"],
+  tagTypes: [
+    "Managers",
+    "Tenants",
+    "Properties",
+    "Leases",
+    "Payments",
+    "Applications",
+  ],
   endpoints: (build) => ({
     getAuthUser: build.query<User, void>({
       queryFn: async (_, _queryApi, _extraOption, fetchWithBQ) => {
@@ -208,6 +222,46 @@ export const api = createApi({
       query: (leaseId) => `/leases/${leaseId}/payments`,
       providesTags: ["Payments"],
     }),
+
+    // APPLICATIONS RELATED ENDPOINTS
+    getApplications: build.query<
+      Application[],
+      {
+        userId?: string;
+        userType?: "tenant" | "manager";
+      }
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params.userId) {
+          queryParams.append("userId", params.userId);
+        }
+        if (params.userType) {
+          queryParams.append("userType", params.userType);
+        }
+        return `/applications?${queryParams.toString()}`;
+      },
+      providesTags: ["Applications"],
+    }),
+    updateApplicationStatus: build.mutation<
+      Application & { lease?: Lease },
+      { applicationId: number; status: string }
+    >({
+      query: ({ applicationId, status }) => ({
+        url: `/applications/${applicationId}/status`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: ["Applications"],
+    }),
+    createApplication: build.mutation<Application, Partial<Application>>({
+      query: (newApplication) => ({
+        url: `/applications`,
+        method: "POST",
+        body: newApplication,
+      }),
+      invalidatesTags: ["Applications"],
+    }),
   }),
 });
 
@@ -221,9 +275,12 @@ export const {
   useGetLeasesQuery,
   useGetPropertyLeasesQuery,
   useGetPaymentsQuery,
+  useGetApplicationsQuery,
   useUpdateTenantSettingsMutation,
   useUpdateManagerSettingsMutation,
   useAddFavoritePropertyMutation,
   useCreatePropertyMutation,
   useRemoveFavoritePropertyMutation,
+  useUpdateApplicationStatusMutation,
+  useCreateApplicationMutation,
 } = api;

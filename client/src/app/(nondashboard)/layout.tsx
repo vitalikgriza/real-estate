@@ -23,9 +23,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         router.push("/managers/properties", {
           scroll: false,
         });
+      } else {
+        setIsLoading(false);
       }
-    } else {
-      setIsLoading(false);
     }
   }, [authUser, pathname, router]);
 
