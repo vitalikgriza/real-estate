@@ -5,6 +5,7 @@ import { NAVBAR_HEIGHT } from "@/lib/constants";
 import { NavBar } from "@/components/navbar";
 import { useGetAuthUserQuery } from "@/state/api";
 import { usePathname, useRouter } from "next/navigation";
+import { Loading } from "@/components/loading";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { data: authUser, isLoading: authLoading } = useGetAuthUserQuery();
@@ -26,11 +27,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       } else {
         setIsLoading(false);
       }
+    } else {
+      setIsLoading(false);
     }
   }, [authUser, pathname, router]);
 
   if (authLoading || isLoading) {
-    return <>Loading...</>;
+    return <Loading />;
   }
 
   return (
