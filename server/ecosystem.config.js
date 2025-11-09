@@ -3,9 +3,9 @@ module.exports = {
     {
       name: 'real-estate-app',
       script: 'npm',
-      args: 'run dev',
+      args: 'run start',
       env: {
-        NODE_ENV: 'development',
+        NODE_ENV: 'production',
       }
     },
   ],

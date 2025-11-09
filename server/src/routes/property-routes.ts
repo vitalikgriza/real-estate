@@ -10,7 +10,7 @@ const upload = multer({ storage: storage });
 
 router.get('/', getProperties);
 router.get('/:id', getProperty);
-router.get('/:id/leases', getPropertyLeases);
+router.get('/:id/leases', authMiddleware(['tenant']), getPropertyLeases);
 router.post('/',
     authMiddleware(['manager']),
     upload.array('photos'),
