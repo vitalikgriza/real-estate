@@ -1,9 +1,10 @@
-import {Location, Prisma, PrismaClient} from "@prisma/client";
+import { Location, Prisma, PrismaClient, Property } from "@prisma/client";
 import {Request, Response} from 'express';
 import {wktToGeoJSON} from "@terraformer/wkt";
 import {Upload} from "@aws-sdk/lib-storage";
 import {S3Client} from "@aws-sdk/client-s3";
 import axios from "axios";
+import { preSignUrls } from "../utils/pre-sign-urls";
 
 const prisma = new PrismaClient({
   log: ['query'],
@@ -124,8 +125,14 @@ export const getProperties = async (req: Request, res: Response) => {
         ${whereConditions.length ? Prisma.sql`WHERE ${Prisma.join(whereConditions, ' AND ')}` : Prisma.empty}
    `;
 
-   const properties = await prisma.$queryRaw(completeQuery);
-
+   const rawProperties = await prisma.$queryRaw<Property[]>(completeQuery);
+    const properties = await Promise.all(rawProperties.map(async (rawProperty) => {
+      const preSignedPhotoUrls = await preSignUrls(rawProperty.photoUrls, s3Client);
+      return {
+        ...rawProperty,
+        photoUrls: preSignedPhotoUrls,
+      }
+    }));
    res.json(properties);
  } catch (err) {
    res.status(500).json({ message: 'Error retrieving properties ' + (err as Error).message });
@@ -155,14 +162,19 @@ export const getPropertyLeases = async (req: Request, res: Response) => {
 export const getProperty = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const property = await prisma.property.findUnique({
+    const rawProperty = await prisma.property.findUnique({
       where: { id: Number(id) },
       include: {
         location: true,
       },
     });
 
-    if (property) {
+    if (rawProperty) {
+      const preSignedPhotoUrls = await preSignUrls(rawProperty.photoUrls, s3Client);
+      const property = {
+        ...rawProperty,
+        photoUrls: preSignedPhotoUrls,
+      }
       const coordinates : { coordinates: string} [] =  await prisma.$queryRaw`
         SELECT ST_AsText(l.coordinates) as coordinates
         FROM "Location" l
