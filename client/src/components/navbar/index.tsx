@@ -54,7 +54,7 @@ const NavBar = () => {
             <div className="flex items-center gap-3">
               <Image
                 src="/logo.svg"
-                alt="Rentiful Logo"
+                alt="Renti Logo"
                 width={24}
                 height={24}
                 className="h-6 w-6"
@@ -62,7 +62,7 @@ const NavBar = () => {
               <div className="text-xl font-bold">
                 RENT
                 <span className="text-secondary-500 font-light hover:text-primary-300">
-                  IFUL
+                  I
                 </span>
               </div>
             </div>
