@@ -15,7 +15,7 @@ function FooterSection() {
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="mb-4">
             <Link href="/" className="text-xl font-bold " scroll={false}>
-              RENTIFUL
+              RENTI
             </Link>
           </div>
           <nav className="mb-4">
