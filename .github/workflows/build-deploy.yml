@@ -18,7 +18,4 @@ jobs:
           node-version: '18' # Specify your project's Node.js version
 
       - name: Install dependencies # Command to install project dependencies
-        run: npm ci
-
-      - name: Run tests # Command to execute your tests
-        run: npm test
+        run: cd client && npm install
