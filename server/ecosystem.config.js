@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'real-estate-app',
+      name: 'renti-app',
       script: 'npm',
       args: 'run start',
       env: {
