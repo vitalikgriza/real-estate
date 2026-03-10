@@ -9,7 +9,7 @@ function CallToActionSection() {
     <div className="relative py-24">
       <Image
         src="/landing-call-to-action.jpg"
-        alt="Renti Search Section Background"
+        alt="Rentiful Search Section Background"
         fill
         className="object-cover object-center"
       />
