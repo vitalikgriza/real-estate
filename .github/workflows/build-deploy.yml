@@ -1,0 +1,24 @@
+name: Deploy and Test
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # Specifies the virtual machine environment
+
+    steps:
+      - name: Checkout repository # Step to check out your code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js # Step to set up the language environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Specify your project's Node.js version
+
+      - name: Install dependencies # Command to install project dependencies
+        run: npm ci
+
+      - name: Run tests # Command to execute your tests
+        run: npm test
