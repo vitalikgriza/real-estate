@@ -63,7 +63,7 @@
 - **Navigate to the directory and install packages:**
 
   ```
-  cd rentis-prod
+  cd rentissss-prod
   ```
 
   ```

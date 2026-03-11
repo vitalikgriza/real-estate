@@ -49,7 +49,7 @@ const HeroSection = () => {
     <div className="relative h-screen">
       <Image
         src="/landing-splash.jpg"
-        alt="Rentis Rental Platform Hero Section"
+        alt="Rentissss Rental Platform Hero Section"
         fill
         className="object-cover object-center"
       />
