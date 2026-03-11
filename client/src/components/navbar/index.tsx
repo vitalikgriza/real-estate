@@ -54,13 +54,13 @@ const NavBar = () => {
             <div className="flex items-center gap-3">
               <Image
                 src="/logo.svg"
-                alt="Rentissss Logo"
+                alt="Rentiful Logo"
                 width={24}
                 height={24}
                 className="h-6 w-6"
               />
               <div className="text-xl font-bold">
-                RENTISSSS
+                RENTIFUL
               </div>
             </div>
           </Link>

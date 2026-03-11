@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rentissss",
-  description: "Rentissss — Real estate rental platform",
+  title: "Rentiful",
+  description: "Rentiful — Real estate rental platform",
 };
 
 export default function RootLayout({
