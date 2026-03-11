@@ -1,9 +1,8 @@
 name: Deploy and Test
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [ opened, synchronize, reopened ]
 jobs:
   build-and-test:
     runs-on: ubuntu-latest # Specifies the virtual machine environment
