@@ -1,6 +1,6 @@
-# Rentiful (Client)
+# Rentis (Client)
 
-Frontend (Next.js) for the **Rentiful** real estate rental platform.
+Frontend (Next.js) for the **Rentis** real estate rental platform.
 
 ## Getting started
 
