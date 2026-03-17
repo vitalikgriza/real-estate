@@ -15,7 +15,7 @@ function FooterSection() {
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="mb-4">
             <Link href="/" className="text-xl font-bold " scroll={false}>
-              RENTISSSS
+              RENTIS
             </Link>
           </div>
           <nav className="mb-4">
@@ -66,7 +66,7 @@ function FooterSection() {
         </div>
         <div className="mt-8 text-center text-sm text-gray-500 justify-between space-x-6">
           <span>
-            &copy; Rentissss {new Date().getFullYear()}. All rights reserved.
+            &copy; Rentis {new Date().getFullYear()}. All rights reserved.
           </span>
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms of Service</Link>
