@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'rentissss-app',
+      name: 'rentiful-app',
       script: 'npm',
       args: 'run start',
       env: {
