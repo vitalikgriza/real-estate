@@ -15,6 +15,11 @@ interface PropertyRequestParams {
 export const getTenant = async (req: Request<TenantRequestParams>, res: Response): Promise<void> => {
     const { cognitoId } = req.params;
 
+    if (req.user?.id !== cognitoId) {
+      res.status(403).json({ message: 'Access denied' });
+      return;
+    }
+
     try {
       const tenant = await prisma.tenant.findUnique({
         where: { cognitoId },
@@ -53,6 +58,11 @@ export const updateTenant = async (req: Request<TenantRequestParams>, res: Respo
   const { cognitoId } = req.params;
   const { name, email, phoneNumber } = req.body;
 
+  if (req.user?.id !== cognitoId) {
+    res.status(403).json({ message: 'Access denied' });
+    return;
+  }
+
   try {
     const updatedTenant = await prisma.tenant.update({
       where: { cognitoId },
@@ -68,6 +78,12 @@ export const updateTenant = async (req: Request<TenantRequestParams>, res: Respo
 
 export const getCurrentResidences = async (req: Request<TenantRequestParams>, res: Response): Promise<void> => {
   const {cognitoId} = req.params;
+
+  if (req.user?.id !== cognitoId) {
+    res.status(403).json({ message: 'Access denied' });
+    return;
+  }
+
   try {
     const tenant = await prisma.tenant.findUnique({
       where: {cognitoId},
@@ -123,6 +139,12 @@ export const getCurrentResidences = async (req: Request<TenantRequestParams>, re
 export const addFavoriteProperty = async (req: Request<TenantRequestParams & PropertyRequestParams>, res: Response): Promise<void> => {
   const {cognitoId, propertyId} = req.params;
   const propertyIdNumber = Number(propertyId);
+
+  if (req.user?.id !== cognitoId) {
+    res.status(403).json({ message: 'Access denied' });
+    return;
+  }
+
   try {
     const tenant = await prisma.tenant.findUnique({
       where: {cognitoId},
@@ -170,6 +192,12 @@ export const addFavoriteProperty = async (req: Request<TenantRequestParams & Pro
 export const removeFavoriteProperty = async (req: Request<TenantRequestParams & PropertyRequestParams>, res: Response): Promise<void> => {
   const {cognitoId, propertyId} = req.params;
   const propertyIdNumber = Number(propertyId);
+
+  if (req.user?.id !== cognitoId) {
+    res.status(403).json({ message: 'Access denied' });
+    return;
+  }
+
   try {
     const updatedTenant = await prisma.tenant.update({
       where: {cognitoId},

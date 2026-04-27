@@ -7,9 +7,16 @@ const prisma = new PrismaClient({
 });
 
 export const listApplications = async (req: Request, res: Response) => {
-  const { userId, userType  } = req.query;
+  const userId = req.user?.id;
+  const userType = req.user?.role;
+
+  if (!userId || !userType) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
   try {
     let whereClause = {};
+
     if (userType === 'manager') {
       whereClause = {
         where: {
@@ -17,11 +24,11 @@ export const listApplications = async (req: Request, res: Response) => {
             managerCognitoId: userId,
           }
         }
-      }
+      };
     } else if (userType === 'tenant') {
       whereClause = {
         where : { tenantCognitoId: userId },
-      }
+      };
     }
 
     const applications = await prisma.application.findMany({
@@ -69,8 +76,8 @@ export const listApplications = async (req: Request, res: Response) => {
 
 
 export const createApplication = async (req: Request, res: Response) => {
+  const tenantCognitoId = req.user?.id;
   const {
-    tenantCognitoId,
     propertyId,
     message,
     name,
@@ -78,6 +85,11 @@ export const createApplication = async (req: Request, res: Response) => {
     phoneNumber,
     status,
   } = req.body;
+
+  if (!tenantCognitoId) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
   try {
 
     const property = await prisma.property.findUnique({
@@ -136,6 +148,12 @@ export const createApplication = async (req: Request, res: Response) => {
 export const updateApplicationStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;
+  const managerCognitoId = req.user?.id;
+
+  if (!managerCognitoId) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
   try {
     const application = await prisma.application.findUnique({
       where: { id: Number(id) },
@@ -148,6 +166,10 @@ export const updateApplicationStatus = async (req: Request, res: Response) => {
     if (!application) {
       res.status(404).json({ message: 'Application not found' });
       return;
+    }
+
+    if (application.property.managerCognitoId !== managerCognitoId) {
+      return res.status(403).json({ message: 'Access denied' });
     }
 
     if (status === "Approved") {

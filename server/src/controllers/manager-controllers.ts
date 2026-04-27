@@ -11,6 +11,11 @@ interface ManagerRequestParams {
 export const getManager = async (req: Request<ManagerRequestParams>, res: Response): Promise<void> => {
     const { cognitoId } = req.params;
 
+    if (req.user?.id !== cognitoId) {
+      res.status(403).json({ message: 'Access denied' });
+      return;
+    }
+
     try {
       const manager = await prisma.manager.findUnique({
         where: { cognitoId },
@@ -44,6 +49,11 @@ export const updateManager = async (req: Request<ManagerRequestParams>, res: Res
   const { cognitoId } = req.params;
   const { name, email, phoneNumber } = req.body;
 
+  if (req.user?.id !== cognitoId) {
+    res.status(403).json({ message: 'Access denied' });
+    return;
+  }
+
   try {
     const updatedManager = await prisma.manager.update({
       where: { cognitoId },
@@ -58,6 +68,12 @@ export const updateManager = async (req: Request<ManagerRequestParams>, res: Res
 
 export const getManagerProperties = async (req: Request<ManagerRequestParams>, res: Response): Promise<void> => {
   const {cognitoId} = req.params;
+
+  if (req.user?.id !== cognitoId) {
+    res.status(403).json({ message: 'Access denied' });
+    return;
+  }
+
   try {
     const manager = await prisma.manager.findUnique({
       where: {cognitoId},
