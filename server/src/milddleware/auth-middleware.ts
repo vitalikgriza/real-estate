@@ -1,10 +1,16 @@
-import {Response, Request, NextFunction}  from "express";
+import {Response, Request, NextFunction} from "express";
 import jwt, {JwtPayload} from "jsonwebtoken";
-
 
 interface DecodedToken extends JwtPayload {
   sub: string;
+  token_use?: string;
   "custom:role"?: string;
+}
+
+const jwtSecret = process.env.JWT_SECRET;
+
+if (!jwtSecret) {
+  throw new Error("JWT_SECRET environment variable is required");
 }
 
 declare global {
@@ -13,7 +19,7 @@ declare global {
       user?: {
         id: string;
         role?: string;
-      }
+      };
     }
   }
 }
@@ -27,21 +33,29 @@ export const authMiddleware = (allowedRoles: string[]) => {
     }
 
     try {
-      const decoded = jwt.decode(token) as DecodedToken;
+      const decoded = jwt.verify(token, jwtSecret, {
+        algorithms: ["HS256"],
+      }) as DecodedToken;
       const userRole = decoded["custom:role"] || "";
+
+      if (!decoded.sub) {
+        return res.status(401).json({message: "Invalid token"});
+      }
+
       req.user = {
         id: decoded.sub,
-        role: decoded.role,
-      }
+        role: userRole,
+      };
 
       const hasAccess = allowedRoles.includes(userRole.toLowerCase());
 
       if (!hasAccess) {
         return res.status(403).json({message: "Access denied"});
       }
-    } catch (e) {
-      return res.status(400).json({message: "Invalid token"});
+    } catch {
+      return res.status(401).json({message: "Invalid token"});
     }
 
     next();
-  }}
+  };
+};
