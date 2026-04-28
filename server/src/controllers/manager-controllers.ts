@@ -8,8 +8,21 @@ interface ManagerRequestParams {
   cognitoId: string;
 }
 
+const ensureAuthorizedUser = (req: Request<ManagerRequestParams>, res: Response, cognitoId: string): boolean => {
+  if (req.user?.id !== cognitoId) {
+    res.status(403).json({ message: 'Access denied' });
+    return false;
+  }
+
+  return true;
+};
+
 export const getManager = async (req: Request<ManagerRequestParams>, res: Response): Promise<void> => {
     const { cognitoId } = req.params;
+
+    if (!ensureAuthorizedUser(req, res, cognitoId)) {
+      return;
+    }
 
     try {
       const manager = await prisma.manager.findUnique({
@@ -42,6 +55,10 @@ export const getManager = async (req: Request<ManagerRequestParams>, res: Respon
 
 export const updateManager = async (req: Request<ManagerRequestParams>, res: Response): Promise<void> => {
   const { cognitoId } = req.params;
+
+  if (!ensureAuthorizedUser(req, res, cognitoId)) {
+    return;
+  }
   const { name, email, phoneNumber } = req.body;
 
   try {
@@ -58,6 +75,10 @@ export const updateManager = async (req: Request<ManagerRequestParams>, res: Res
 
 export const getManagerProperties = async (req: Request<ManagerRequestParams>, res: Response): Promise<void> => {
   const {cognitoId} = req.params;
+
+  if (!ensureAuthorizedUser(req, res, cognitoId)) {
+    return;
+  }
   try {
     const manager = await prisma.manager.findUnique({
       where: {cognitoId},

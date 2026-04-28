@@ -1,11 +1,20 @@
 import {Response, Request, NextFunction}  from "express";
 import jwt, {JwtPayload} from "jsonwebtoken";
 
-
 interface DecodedToken extends JwtPayload {
   sub: string;
   "custom:role"?: string;
 }
+
+const getJwtVerificationKey = (): string => {
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is not configured");
+  }
+
+  return jwtSecret;
+};
 
 declare global {
   namespace Express {
@@ -27,11 +36,11 @@ export const authMiddleware = (allowedRoles: string[]) => {
     }
 
     try {
-      const decoded = jwt.decode(token) as DecodedToken;
+      const decoded = jwt.verify(token, getJwtVerificationKey()) as DecodedToken;
       const userRole = decoded["custom:role"] || "";
       req.user = {
         id: decoded.sub,
-        role: decoded.role,
+        role: userRole,
       }
 
       const hasAccess = allowedRoles.includes(userRole.toLowerCase());
@@ -40,7 +49,7 @@ export const authMiddleware = (allowedRoles: string[]) => {
         return res.status(403).json({message: "Access denied"});
       }
     } catch (e) {
-      return res.status(400).json({message: "Invalid token"});
+      return res.status(401).json({message: "Invalid token"});
     }
 
     next();

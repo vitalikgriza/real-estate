@@ -12,8 +12,21 @@ interface PropertyRequestParams {
   propertyId: string;
 }
 
+const ensureAuthorizedUser = (req: Request<TenantRequestParams>, res: Response, cognitoId: string): boolean => {
+  if (req.user?.id !== cognitoId) {
+    res.status(403).json({ message: 'Access denied' });
+    return false;
+  }
+
+  return true;
+};
+
 export const getTenant = async (req: Request<TenantRequestParams>, res: Response): Promise<void> => {
     const { cognitoId } = req.params;
+
+    if (!ensureAuthorizedUser(req, res, cognitoId)) {
+      return;
+    }
 
     try {
       const tenant = await prisma.tenant.findUnique({
@@ -51,6 +64,10 @@ export const getTenant = async (req: Request<TenantRequestParams>, res: Response
 
 export const updateTenant = async (req: Request<TenantRequestParams>, res: Response): Promise<void> => {
   const { cognitoId } = req.params;
+
+  if (!ensureAuthorizedUser(req, res, cognitoId)) {
+    return;
+  }
   const { name, email, phoneNumber } = req.body;
 
   try {
@@ -68,6 +85,10 @@ export const updateTenant = async (req: Request<TenantRequestParams>, res: Respo
 
 export const getCurrentResidences = async (req: Request<TenantRequestParams>, res: Response): Promise<void> => {
   const {cognitoId} = req.params;
+
+  if (!ensureAuthorizedUser(req, res, cognitoId)) {
+    return;
+  }
   try {
     const tenant = await prisma.tenant.findUnique({
       where: {cognitoId},
@@ -122,6 +143,10 @@ export const getCurrentResidences = async (req: Request<TenantRequestParams>, re
 
 export const addFavoriteProperty = async (req: Request<TenantRequestParams & PropertyRequestParams>, res: Response): Promise<void> => {
   const {cognitoId, propertyId} = req.params;
+
+  if (!ensureAuthorizedUser(req as Request<TenantRequestParams>, res, cognitoId)) {
+    return;
+  }
   const propertyIdNumber = Number(propertyId);
   try {
     const tenant = await prisma.tenant.findUnique({
@@ -169,6 +194,10 @@ export const addFavoriteProperty = async (req: Request<TenantRequestParams & Pro
 
 export const removeFavoriteProperty = async (req: Request<TenantRequestParams & PropertyRequestParams>, res: Response): Promise<void> => {
   const {cognitoId, propertyId} = req.params;
+
+  if (!ensureAuthorizedUser(req as Request<TenantRequestParams>, res, cognitoId)) {
+    return;
+  }
   const propertyIdNumber = Number(propertyId);
   try {
     const updatedTenant = await prisma.tenant.update({
