@@ -1,11 +1,12 @@
 import {Response, Request, NextFunction}  from "express";
 import jwt, {JwtPayload} from "jsonwebtoken";
 
-
 interface DecodedToken extends JwtPayload {
   sub: string;
   "custom:role"?: string;
 }
+
+const jwtVerificationKey = process.env.JWT_SECRET || process.env.JWT_PUBLIC_KEY;
 
 declare global {
   namespace Express {
@@ -26,12 +27,21 @@ export const authMiddleware = (allowedRoles: string[]) => {
       return res.status(401).json({message: "Unauthorized"});
     }
 
+    if (!jwtVerificationKey) {
+      return res.status(500).json({message: "Authentication is not configured"});
+    }
+
     try {
-      const decoded = jwt.decode(token) as DecodedToken;
+      const decoded = jwt.verify(token, jwtVerificationKey) as DecodedToken;
       const userRole = decoded["custom:role"] || "";
+
+      if (!decoded.sub) {
+        return res.status(401).json({message: "Invalid token"});
+      }
+
       req.user = {
         id: decoded.sub,
-        role: decoded.role,
+        role: userRole,
       }
 
       const hasAccess = allowedRoles.includes(userRole.toLowerCase());
@@ -40,8 +50,9 @@ export const authMiddleware = (allowedRoles: string[]) => {
         return res.status(403).json({message: "Access denied"});
       }
     } catch (e) {
-      return res.status(400).json({message: "Invalid token"});
+      return res.status(401).json({message: "Invalid token"});
     }
 
     next();
-  }}
+  };
+};
